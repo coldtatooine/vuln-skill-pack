@@ -1,6 +1,6 @@
 ---
-name: Stripe Security
-description: Security footguns specific to Stripe payment integrations — unverified webhook signatures, trusting price/amount from the client, secret key exposure, missing idempotency, and fulfillment on the wrong event. Use when reviewing, building, or shipping payment or billing flows with Stripe.
+name: stripe-security
+description: Use when reviewing, building, or shipping Stripe payment or billing flows. Footguns: unverified webhooks, client-trusted amounts, secret key exposure, missing idempotency, wrong fulfillment event, unfiltered event types.
 version: 1.0.0
 ---
 
@@ -8,11 +8,20 @@ version: 1.0.0
 
 Apply when the app integrates Stripe (Checkout, Payment Intents, Subscriptions, webhooks). Payment code moves money, so bugs are directly monetizable. Pair with `/scan`, `/preflight`, `/secrets`.
 
+## Verify before flagging
+
+- `pk_*` in the client / public env is expected; only flag `sk_*`, `rk_*`, `whsec_*` outside server-only contexts.
+- Distinguish **test** vs **live** keys: still flag committed secret keys, but treat live as higher severity.
+- Missing idempotency is a finding when fulfillment has side effects (credits, shipping, entitlements) — not every read-only webhook handler.
+- `livemode` checks matter when production must ignore test events (or vice versa); don't flag if both modes are intentionally handled.
+
 ## 1. Webhook signature verification (Critical)
 
 - **Every webhook endpoint must verify the Stripe signature** using the endpoint's signing secret (`stripe.webhooks.constructEvent(rawBody, sig, secret)`). Without it, anyone can POST a fake `checkout.session.completed` and get free fulfillment.
 - **Use the raw request body**, not parsed JSON. Frameworks that auto-parse the body (Express `json()`, Next.js default body parsing) break verification — the signature is computed over raw bytes. Disable body parsing on the webhook route.
 - Reject on verification failure. Don't fall through to processing.
+- **Allowlist event types** you handle; ignore or reject unexpected types instead of a catch-all switch that fulfills on anything.
+- If production should only process live traffic, check `event.livemode` (or equivalent) before fulfilling.
 
 ## 2. Never trust amounts or entitlements from the client
 
@@ -43,6 +52,7 @@ Apply when the app integrates Stripe (Checkout, Payment Intents, Subscriptions, 
 
 ## Quick checklist
 - [ ] Webhook verifies signature over the raw body; rejects on failure
+- [ ] Handled event types are allowlisted; `livemode` checked when required
 - [ ] Amount, currency, quantity, entitlement computed server-side from trusted data
 - [ ] Fulfillment happens on verified webhook, not the success redirect; checks `paid`
 - [ ] `sk_*` / `whsec_*` server-only; only `pk_*` in the client

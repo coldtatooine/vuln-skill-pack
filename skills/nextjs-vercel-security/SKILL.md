@@ -1,12 +1,19 @@
 ---
-name: Next.js & Vercel Security
-description: Security footguns specific to Next.js and Vercel apps — client/server secret leakage via NEXT_PUBLIC, unauthenticated Server Actions and Route Handlers, middleware auth bypass, SSRF in server fetches, and edge/runtime pitfalls. Use when reviewing, building, or shipping a Next.js or Vercel project.
+name: nextjs-vercel-security
+description: Use when reviewing, building, or shipping a Next.js or Vercel project. Footguns: NEXT_PUBLIC secret leakage, unauthenticated Server Actions and Route Handlers, middleware auth bypass, SSRF, edge/CDN caching of auth responses.
 version: 1.0.0
 ---
 
 # Next.js & Vercel Security Footguns
 
 Apply this when the codebase uses Next.js (App or Pages Router) or deploys to Vercel. These are the high-frequency holes; pair with `/scan`, `/preflight`, and `/secrets`.
+
+## Verify before flagging
+
+- `NEXT_PUBLIC_*` with publishable/anon/`pk_` keys is expected — only flag real secrets (`service_role`, `sk_`, DB URLs, JWT secrets).
+- Middleware matcher gaps need a **concrete uncovered protected path**, not a vague "matcher looks incomplete."
+- A Server Action that verifies session + ownership is not "unauthenticated" just because it is a public POST endpoint by design.
+- CDN/edge caching is only a finding when **authenticated or user-specific** responses can be cached and shared.
 
 ## 1. Secret leakage across the client/server boundary
 
@@ -18,6 +25,7 @@ Apply this when the codebase uses Next.js (App or Pages Router) or deploys to Ve
 ## 2. Server Actions
 
 - **Every Server Action is a public POST endpoint.** No auth is applied automatically. Each action must independently verify session AND authorization — do not assume it's only callable from your UI.
+- **Origin / CSRF posture:** confirm actions check a trusted origin (or equivalent framework protection) and a valid session before mutating state.
 - **Validate and authorize arguments.** Args are attacker-controlled. Re-check ownership/tenant on every ID passed in. Don't trust hidden form fields.
 - Actions defined inline in a Server Component are still individually invocable.
 
@@ -47,8 +55,9 @@ Apply this when the codebase uses Next.js (App or Pages Router) or deploys to Ve
 
 ## Quick checklist
 - [ ] No real secret under `NEXT_PUBLIC_*` or in a client-imported module
-- [ ] Every Server Action verifies session + authorization + argument ownership
+- [ ] Every Server Action verifies session + authorization + argument ownership (and origin/CSRF posture)
 - [ ] Every Route Handler checks auth and ownership (no IDOR)
 - [ ] Middleware matcher covers all protected paths; authz re-enforced at data layer
 - [ ] User-supplied URLs in server fetch/image config are allowlisted
 - [ ] Redirects restricted to same-origin relative paths
+- [ ] Authenticated/user-specific responses not cached at CDN/edge
