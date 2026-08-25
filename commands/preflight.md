@@ -4,6 +4,8 @@ description: Pre-launch security gate for MVPs. Fast checklist of the holes that
 
 # /preflight — Pre-Launch Security Gate
 
+Also available as the `preflight` skill.
+
 Answer one question: **is `$ARGUMENTS` (default `.`) safe to deploy to a public URL?**
 
 Optimized for MVPs shipping fast. This is a gate, not a full audit — check the high-frequency, high-blast-radius holes and give a clear verdict. Run `/scan` for depth.

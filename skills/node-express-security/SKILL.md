@@ -1,12 +1,19 @@
 ---
-name: Node & Express API Security
-description: Security footguns specific to Node.js and Express REST APIs — missing auth/authz middleware, IDOR, broken JWT verification, permissive CORS, SQL/NoSQL/command injection, missing rate limiting and security headers, and mass assignment. Use when reviewing, building, or shipping a Node/Express backend.
+name: node-express-security
+description: Use when reviewing, building, or shipping a Node/Express (or Fastify/Koa/Nest) API. Footguns: missing authz, IDOR, broken JWT, permissive CORS, injection, mass assignment, proxy/cookie misconfig.
 version: 1.0.0
 ---
 
 # Node.js & Express API Security Footguns
 
 Apply when the app is a Node/Express (or similar: Fastify, Koa, NestJS) REST API. Pair with `/scan`, `/preflight`, `/secrets`.
+
+## Verify before flagging
+
+- A route is only "missing auth" if it is reachable **without** the auth middleware in the mount chain — trace order before flagging.
+- `cors({ origin: '*' })` without credentials is often intentional for public APIs; BLOCK when combined with credentials or reflected unchecked `Origin`.
+- JWT `decode` used for non-auth display is not a finding; flag when it gates access.
+- Cookie/`trust proxy` issues matter when sessions or secure cookies are actually used behind a reverse proxy.
 
 ## 1. Authentication & authorization
 
@@ -38,8 +45,10 @@ Apply when the app is a Node/Express (or similar: Fastify, Koa, NestJS) REST API
 - **Body size limit**: cap `express.json({ limit })` to prevent DoS.
 - **Mass assignment**: `Object.assign(user, req.body)` / spreading `req.body` into a model lets a client set `isAdmin`/`role`. Allowlist writable fields.
 
-## 6. Other
+## 6. Proxy, cookies & other
 
+- **`trust proxy`**: if behind a reverse proxy/load balancer, configure it correctly so `req.ip` / secure cookies / rate limits reflect the real client — wrong settings break IP-based controls or cookie `Secure` behavior.
+- **Session cookies**: set `secure`, `httpOnly`, and a strict `sameSite` when using cookie-based auth.
 - **Error handling**: don't send stack traces / internal errors to clients in prod. Central error handler, generic messages.
 - **Prototype pollution**: deep-merge of untrusted JSON with `__proto__` keys; validate/sanitize.
 - **SSRF**: server-side requests to user-supplied URLs → allowlist hosts, block internal ranges and cloud metadata.
@@ -53,3 +62,4 @@ Apply when the app is a Node/Express (or similar: Fastify, Koa, NestJS) REST API
 - [ ] Parameterized queries; `execFile`/`spawn` not `exec`; path traversal guarded
 - [ ] Rate limiting, `helmet`, body-size limit in place
 - [ ] Writable fields allowlisted (no mass assignment); no stack traces to clients
+- [ ] Behind proxy: `trust proxy` correct; cookies use `secure` + `httpOnly` + `sameSite`
