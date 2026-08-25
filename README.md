@@ -4,6 +4,24 @@ A Claude Code plugin for **shipping MVPs fast without skipping security**. Built
 
 Ten slash commands, four stack-specific footgun guides, a security-reviewer agent, and an automated secret-leak gate for pre-commit and CI. Ships for **Claude Code** (marketplace plugin), **Cursor plugins** (`.cursor-plugin/plugin.json` + root `skills/`), and the **Cursor CLI** project copy under `cursor/`.
 
+## Marketplace description
+
+### en-US short
+
+Pre-launch security gate for MVPs. Secrets, auth holes, and stack footguns, then a BLOCK / WARN / GO verdict. Defensive review only.
+
+### en-US long
+
+Ship an MVP without shipping a day-one breach. Vuln Skill Pack is a pre-launch security gate: scan for leaked secrets, unauthenticated endpoints, IDOR, CORS mistakes, and insecure defaults, then return a clear BLOCK / WARN / GO with file:line evidence. Includes a preflight skill plus footgun guides for Next.js/Vercel, Supabase, Stripe, and Node/Express. Verify-before-flag so publishable keys and deny-all RLS do not become false alarms. Authorized, defensive review of your own code only.
+
+### pt-BR short
+
+Portão de segurança pré-lançamento para MVPs. Segredos, buracos de auth e footguns de stack, com veredito BLOCK / WARN / GO. Só revisão defensiva.
+
+### pt-BR long
+
+Publique um MVP sem publicar um incidente no dia um. O Vuln Skill Pack é um portão de segurança pré-lançamento: procura segredos vazados, endpoints sem auth, IDOR, CORS permissivo e defaults inseguros, e devolve BLOCK / WARN / GO com evidência em arquivo:linha. Inclui a skill de preflight e guias de footgun para Next.js/Vercel, Supabase, Stripe e Node/Express. Verifica antes de flagar, para chave anon e RLS deny-all não virarem alarme falso. Uso autorizado e defensivo, só no seu código.
+
 ## Commands
 
 | Command | Description |
