@@ -1,0 +1,27 @@
+{
+  "name": "vuln-skill-pack",
+  "displayName": "Vuln Skill Pack",
+  "version": "1.2.0",
+  "description": "Ship MVPs fast without shipping a breach. A pre-launch security gate (/preflight), secrets scanner, attack-surface mapping, data-flow tracing, vuln scanning, guided fixes, and launch triage — plus a senior appsec agent and auto-loading footgun guides for Next.js/Vercel, Supabase, Stripe, and Node/Express. Defensive review only.",
+  "author": {
+    "name": "coldtatooine",
+    "email": "sandro.box@gmail.com",
+    "url": "https://github.com/coldtatooine"
+  },
+  "repository": "https://github.com/coldtatooine/vuln-skill-pack",
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "appsec",
+    "vulnerability",
+    "code-review",
+    "penetration-testing",
+    "defensive",
+    "mvp",
+    "startup",
+    "secrets",
+    "nextjs",
+    "supabase",
+    "stripe"
+  ]
+}

@@ -2,7 +2,7 @@
 
 A Claude Code plugin for **shipping MVPs fast without skipping security**. Built for local startups that need to get a product live quickly but can't afford a day-one breach.
 
-Ten slash commands, four stack-specific footgun guides, a security-reviewer agent, and an automated secret-leak gate for pre-commit and CI. Ships for both **Claude Code** (marketplace plugin) and the **Cursor CLI** (`.cursor/` commands, rules, and hooks).
+Ten slash commands, four stack-specific footgun guides, a security-reviewer agent, and an automated secret-leak gate for pre-commit and CI. Ships for **Claude Code** (marketplace plugin), **Cursor plugins** (`.cursor-plugin/plugin.json` + root `skills/`), and the **Cursor CLI** project copy under `cursor/`.
 
 ## Commands
 
@@ -48,18 +48,28 @@ Loaded automatically when Claude detects the stack. Each is a checklist of the h
 ### From Source
 
 ```bash
-git clone https://github.com/coldtatooine/vun-skill-pack.git
+git clone https://github.com/coldtatooine/vuln-skill-pack.git
 ```
 
 Then add a local marketplace entry pointing to the cloned directory in Claude Code settings.
 
-### Cursor CLI
+### Cursor plugin (IDE / marketplace)
 
-The same pack ships in Cursor-native format under `cursor/` (commands, rules, hooks, `AGENTS.md`). Install into a project:
+This repo includes a Cursor plugin manifest at `.cursor-plugin/plugin.json` (`name`: `vuln-skill-pack`). Skills under `skills/*/SKILL.md` are discovered automatically.
+
+**Local install:** clone or copy the repo into `~/.cursor/plugins/local/vuln-skill-pack` so Cursor loads it immediately.
+
+**Marketplace:** submit the GitHub repo at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish). Official install docs: [cursor.com/docs/plugins](https://cursor.com/docs/plugins).
+
+> Repo URL for Cursor is `https://github.com/coldtatooine/vuln-skill-pack`. The Claude plugin id remains `vun-skill-pack` (legacy spelling).
+
+### Cursor CLI (project copy)
+
+The same pack also ships in Cursor-native format under `cursor/` (commands, rules, hooks, `AGENTS.md`). Install into a project:
 
 ```bash
-git clone https://github.com/coldtatooine/vun-skill-pack.git
-vun-skill-pack/cursor/install.sh /path/to/your/project
+git clone https://github.com/coldtatooine/vuln-skill-pack.git
+vuln-skill-pack/cursor/install.sh /path/to/your/project
 ```
 
 This copies commands into `.cursor/commands/`, stack rules into `.cursor/rules/`, and a `beforeReadFile` hook (`.cursor/hooks.json`) that blocks raw secret files from being read into model context. The Cursor CLI (`cursor-agent`) also reads `.cursor/rules` and `AGENTS.md` automatically. All 11 commands are available: `/preflight /secrets /scan /recon /trace /vuln /threat-model /triage /fix /finding /security-review`.
